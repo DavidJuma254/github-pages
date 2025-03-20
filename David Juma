@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Background Website</title>
+  <style>
+    /* Reset default margin and padding */
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Video Background */
+    #video-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* Ensures the video covers the entire background */
+      z-index: -1; /* Places the video behind other content */
+    }
+
+    /* Content Container */
+    .content {
+      position: relative;
+      z-index: 1; /* Places content above the video */
+      text-align: center;
+      color: #fff;
+      padding: 20px;
+      background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Heading */
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+
+    /* Paragraph */
+    p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin-bottom: 30px;
+    }
+
+    /* Button */
+    .btn {
+      padding: 10px 20px;
+      font-size: 1rem;
+      color: #fff;
+      background-color: #007bff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Video Background -->
+  <video id="video-background" autoplay muted loop>
+    <source src="0be9e4ecb2843708f82cdef5ff111908.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <!-- Content -->
+  <div class="content">
+    <h1>Welcome to Our Website</h1>
+    <p>Experience the future of web design with a stunning video background. Perfect for showcasing your brand or product.</p>
+    <a href="#about" class="btn">Learn More</a>
+  </div>
+
+  <!-- JavaScript to Ensure Video Plays on Mobile Devices -->
+  <script>
+    const video = document.getElementById('video-background');
+    video.play(); // Ensure the video plays automatically
+  </script>
+
+</body>
+</html>
