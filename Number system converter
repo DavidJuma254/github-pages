@@ -1,0 +1,388 @@
+import React, { useState } from 'react';
+import {
+  SafeAreaView,
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  Platform,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
+const NumberSystemConverter = () => {
+  const [inputValue, setInputValue] = useState('');
+  const [fromBase, setFromBase] = useState('10');
+  const [results, setResults] = useState({
+    binary: '',
+    octal: '',
+    decimal: '',
+    hexadecimal: '',
+  });
+
+  const validateInput = (value, base) => {
+    if (value === '') return true;
+    
+    const baseNum = parseInt(base);
+    const validChars = {
+      2: /^[01]+$/,
+      8: /^[0-7]+$/,
+      10: /^-?\d+$/,
+      16: /^[0-9A-Fa-f]+$/,
+    };
+
+    return validChars[baseNum] ? validChars[baseNum].test(value) : false;
+  };
+
+  const convertNumber = () => {
+    if (!inputValue) {
+      Alert.alert('Error', 'Please enter a number to convert');
+      return;
+    }
+
+    if (!validateInput(inputValue, fromBase)) {
+      Alert.alert('Error', `Invalid number for base ${fromBase} system`);
+      return;
+    }
+
+    try {
+      const decimalValue = parseInt(inputValue, parseInt(fromBase));
+      
+      if (isNaN(decimalValue)) {
+        throw new Error('Invalid number');
+      }
+
+      setResults({
+        binary: decimalValue.toString(2),
+        octal: decimalValue.toString(8),
+        decimal: decimalValue.toString(10),
+        hexadecimal: decimalValue.toString(16).toUpperCase(),
+      });
+    } catch (error) {
+      Alert.alert('Error', 'Conversion failed. Please check your input.');
+    }
+  };
+
+  const clearAll = () => {
+    setInputValue('');
+    setResults({
+      binary: '',
+      octal: '',
+      decimal: '',
+      hexadecimal: '',
+    });
+  };
+
+  const BaseButton = ({ base, label, isSelected, onPress }) => (
+    <TouchableOpacity
+      style={[
+        styles.baseButton,
+        isSelected && styles.baseButtonSelected,
+      ]}
+      onPress={onPress}
+    >
+      <Text style={[
+        styles.baseButtonText,
+        isSelected && styles.baseButtonTextSelected,
+      ]}>
+        {label}
+      </Text>
+    </TouchableOpacity>
+  );
+
+  const ResultCard = ({ title, value, base }) => (
+    <View style={styles.resultCard}>
+      <Text style={styles.resultTitle}>{title}</Text>
+      <Text style={styles.resultValue}>{value || '-'}</Text>
+      <Text style={styles.resultBase}>Base {base}</Text>
+    </View>
+  );
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.scrollView}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Icon name="swap-vert" size={32} color="#4A90E2" />
+          <Text style={styles.headerTitle}>Number System Converter</Text>
+          <Text style={styles.headerSubtitle}>Convert between different number systems</Text>
+        </View>
+
+        {/* Input Section */}
+        <View style={styles.inputSection}>
+          <Text style={styles.sectionTitle}>Input Number</Text>
+          
+          <TextInput
+            style={styles.textInput}
+            placeholder="Enter number to convert"
+            value={inputValue}
+            onChangeText={setInputValue}
+            keyboardType="default"
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+
+          <Text style={styles.baseLabel}>From Base:</Text>
+          <View style={styles.baseSelector}>
+            <BaseButton
+              base="2"
+              label="Binary (2)"
+              isSelected={fromBase === '2'}
+              onPress={() => setFromBase('2')}
+            />
+            <BaseButton
+              base="8"
+              label="Octal (8)"
+              isSelected={fromBase === '8'}
+              onPress={() => setFromBase('8')}
+            />
+            <BaseButton
+              base="10"
+              label="Decimal (10)"
+              isSelected={fromBase === '10'}
+              onPress={() => setFromBase('10')}
+            />
+            <BaseButton
+              base="16"
+              label="Hex (16)"
+              isSelected={fromBase === '16'}
+              onPress={() => setFromBase('16')}
+            />
+          </View>
+        </View>
+
+        {/* Action Buttons */}
+        <View style={styles.actionButtons}>
+          <TouchableOpacity
+            style={[styles.button, styles.convertButton]}
+            onPress={convertNumber}
+          >
+            <Icon name="autorenew" size={20} color="#FFF" />
+            <Text style={styles.buttonText}>Convert</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.button, styles.clearButton]}
+            onPress={clearAll}
+          >
+            <Icon name="clear" size={20} color="#FFF" />
+            <Text style={styles.buttonText}>Clear</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Results Section */}
+        <View style={styles.resultsSection}>
+          <Text style={styles.sectionTitle}>Conversion Results</Text>
+          
+          <ResultCard
+            title="Binary"
+            value={results.binary}
+            base="2"
+          />
+          
+          <ResultCard
+            title="Octal"
+            value={results.octal}
+            base="8"
+          />
+          
+          <ResultCard
+            title="Decimal"
+            value={results.decimal}
+            base="10"
+          />
+          
+          <ResultCard
+            title="Hexadecimal"
+            value={results.hexadecimal}
+            base="16"
+          />
+        </View>
+
+        {/* Info Section */}
+        <View style={styles.infoSection}>
+          <Text style={styles.infoTitle}>Number Systems Info:</Text>
+          <Text style={styles.infoText}>• Binary: Base 2 (0-1)</Text>
+          <Text style={styles.infoText}>• Octal: Base 8 (0-7)</Text>
+          <Text style={styles.infoText}>• Decimal: Base 10 (0-9)</Text>
+          <Text style={styles.infoText}>• Hexadecimal: Base 16 (0-9, A-F)</Text>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F5F5F5',
+  },
+  scrollView: {
+    flex: 1,
+    padding: 16,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 30,
+    paddingTop: 20,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginTop: 10,
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 5,
+  },
+  inputSection: {
+    backgroundColor: '#FFF',
+    padding: 20,
+    borderRadius: 12,
+    marginBottom: 20,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 15,
+  },
+  textInput: {
+    borderWidth: 1,
+    borderColor: '#DDD',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    marginBottom: 15,
+    backgroundColor: '#F9F9F9',
+  },
+  baseLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 10,
+  },
+  baseSelector: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  baseButton: {
+    flex: 1,
+    minWidth: '48%',
+    padding: 12,
+    margin: 2,
+    backgroundColor: '#F0F0F0',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  baseButtonSelected: {
+    backgroundColor: '#4A90E2',
+  },
+  baseButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#666',
+  },
+  baseButtonTextSelected: {
+    color: '#FFF',
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  button: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 15,
+    borderRadius: 8,
+    marginHorizontal: 5,
+  },
+  convertButton: {
+    backgroundColor: '#4A90E2',
+  },
+  clearButton: {
+    backgroundColor: '#FF6B6B',
+  },
+  buttonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  resultsSection: {
+    marginBottom: 20,
+  },
+  resultCard: {
+    backgroundColor: '#FFF',
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 10,
+    borderLeftWidth: 4,
+    borderLeftColor: '#4A90E2',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
+  },
+  resultTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 5,
+  },
+  resultValue: {
+    fontSize: 18,
+    color: '#4A90E2',
+    fontWeight: '600',
+    marginBottom: 5,
+  },
+  resultBase: {
+    fontSize: 12,
+    color: '#888',
+  },
+  infoSection: {
+    backgroundColor: '#E3F2FD',
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 20,
+  },
+  infoTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1976D2',
+    marginBottom: 8,
+  },
+  infoText: {
+    fontSize: 14,
+    color: '#424242',
+    marginBottom: 4,
+  },
+});
+
+export default NumberSystemConverter;
